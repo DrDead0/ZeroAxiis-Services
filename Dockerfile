@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o server ./cmd/api
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o server ./cmd/api
 
 # ---------- Stage 2 : Run ----------
 
@@ -19,8 +19,6 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY --from=builder /app/server .
-
-COPY .env .
 
 EXPOSE 8080
 

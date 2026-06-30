@@ -1,5 +1,9 @@
 .git
+.gitignore
+.env
 .vscode
-storage
+.idea
 tmp
+node_modules
+README.md
 *.log

@@ -2,7 +2,11 @@ services:
   api:
     build:
       context: .
-    container_name: Go_APIs
+      dockerfile: Dockerfile
+
+    container_name: zeroaxiis-api
+
+    restart: unless-stopped
 
     ports:
       - "8080:8080"
@@ -11,15 +15,21 @@ services:
       - .env
 
     depends_on:
-      - mongodb
-      - redis
+      mongodb:
+        condition: service_healthy
+
+      redis:
+        condition: service_healthy
 
     networks:
       - backend
 
   mongodb:
     image: mongo:8
+
     container_name: mongodb
+
+    restart: unless-stopped
 
     ports:
       - "27017:27017"
@@ -27,18 +37,33 @@ services:
     volumes:
       - mongo_data:/data/db
 
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
     networks:
       - backend
 
   redis:
     image: redis:8-alpine
+
     container_name: redis
+
+    restart: unless-stopped
 
     ports:
       - "6379:6379"
 
     volumes:
       - redis_data:/data
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
     networks:
       - backend
