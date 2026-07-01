@@ -79,16 +79,32 @@ The frontend consumes this API to display:
 
 ```text
 zeroaxiis-backend/
-
+│
 ├── cmd/
-├── internal/
-├── configs/
+│   └── api/
+│
 ├── docs/
+│
+├── internal/
+│   ├── config/
+│   ├── database/
+│   ├── handlers/
+│   ├── middleware/
+│   ├── models/
+│   ├── repository/
+│   ├── routes/
+│   ├── services/
+│   └── utils/
+│
+├── .dockerignore
+├── .env
+├── .gitignore
+├── docker-compose.yaml
 ├── Dockerfile
-├── docker-compose.yml
-├── Makefile
 ├── go.mod
-└── go.sum
+├── go.sum
+├── Makefile
+└── README.md
 ```
 
 
