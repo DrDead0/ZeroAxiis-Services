@@ -121,46 +121,6 @@ Detailed documentation is available inside the **docs/** directory.
 | decisions.md | Architectural decisions |
 
 
-# Running Locally
-
-## Clone
-
-```bash
-git clone https://github.com/your-username/zeroaxiis-backend.git
-
-cd zeroaxiis-backend
-```
-
-## Environment
-
-Create
-
-```text
-.env
-```
-
-using
-
-```text
-.env.example
-```
-
-
-## Run
-
-```bash
-docker compose up --build
-```
-
-
-# Development Status
-
-Current Phase
-
-```
-Planning & Architecture
-```
-
 
 # Design Principles
 
