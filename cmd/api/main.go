@@ -18,13 +18,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+  _= mongoClient
 	// Create Gin Engine
 	router := gin.Default()
 
-	// // Register Routes
-	routes.SetupRoutes(router, mongoClient)
-
+	// Routes- grouping
+	api := router.Group("/api/v1")
+	
+	routes.TestRoutes(api)
 	// Start Server
 	err = router.Run(":" + cfg.Port)
 	if err != nil {
