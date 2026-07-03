@@ -2,9 +2,9 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"time"
 	"github.com/redis/go-redis/v9"
+	"github.com/zeroaxiis/ZeroAxiis-Services/internal/utils"
 )
 
 var RedisClient *redis.Client
@@ -25,7 +25,7 @@ func ConnectRedis(uri string)( *redis.Client, error){
 		return nil ,err
 	}
 	RedisClient = client
-	fmt.Println("Redis Server is Connected")
+	utils.Log.Info("Redis is connected")
 
 	return client , nil
 }

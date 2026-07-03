@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 	"time"
-	"fmt"
+	"github.com/zeroaxiis/ZeroAxiis-Services/internal/utils"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
@@ -26,6 +26,6 @@ func ConnectMongo(uri string) (*mongo.Client, error){
 	}
 
 	Client = client
-	fmt.Println("Mongodb server is connected")
+	utils.Log.Info("MongoDB Server is Connected")
 	return client ,nil
 }

@@ -14,6 +14,9 @@ type Config struct {
 	CloudinaryCloudName string
 	CloudinaryAPIKey    string
 	CloudinaryAPISecret string
+	AppEnv string
+	PublicFrontend string
+	AdminFrontend string
 }
 
 func Load() (*Config, error) {
@@ -29,6 +32,10 @@ func Load() (*Config, error) {
 		CloudinaryCloudName: os.Getenv("CLOUDINARY_CLOUD_NAME"),
 		CloudinaryAPIKey:    os.Getenv("CLOUDINARY_API_KEY"),
 		CloudinaryAPISecret: os.Getenv("CLOUDINARY_API_SECRET"),
+		AppEnv: os.Getenv("APP_ENV"),
+		PublicFrontend: os.Getenv("PUBLIC_FRONTEND"),
+		AdminFrontend: os.Getenv("ADMIN_FRONTEND"),
+
 	}
 
 	if err := cfg.validate(); err != nil {
@@ -63,6 +70,12 @@ func (c *Config) validate() error{
 		return errors.New("CLOUDINARY_API_KEY is Required")
 	case c.CloudinaryAPISecret == "":
 		return errors.New("CLOUDINARY_API_SECRET is Required")
+	case c.AppEnv == "":
+		return errors.New("Logger Env is required")
+	case c.PublicFrontend == "":
+		return errors.New("Public Frontend URL is needed for CORS")
+	case c.AdminFrontend == "":
+		return errors.New("Admin Frontend url is needed for Data Management")
 	}
 	return nil
 }
