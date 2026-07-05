@@ -39,7 +39,7 @@ func RateLimiter(limit int64, window time.Duration) gin.HandlerFunc {
 			return
 		}
 
-		// Temporary (count will be used in next step)
+		// Temporary
 		_ = count
 		_ = limit
 		_ = window
