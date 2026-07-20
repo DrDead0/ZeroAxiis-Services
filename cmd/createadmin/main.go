@@ -1,1 +1,5 @@
 package createadmin
+
+
+
+func CreateAdmin(){}
