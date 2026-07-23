@@ -120,3 +120,32 @@ func Login(c *gin.Context) {
 	})
 
 }
+
+func Logout(c *gin.Context) {
+
+	claims := c.MustGet("claims").(*utils.JWTClaims)
+
+	err := utils.DeleteSession(claims.SessionID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Internal Server Error",
+		})
+		return
+	}
+
+	c.SetCookie(
+		"token",
+		"",
+		-1,
+		"/",
+		"",
+		false,
+		true,
+	)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Logged out successfully",
+	})
+}

@@ -70,10 +70,10 @@ func main() {
 			"email": email,
 		},
 	)
+	err = result.Decode(&admin)
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		pkg.Log.Fatal("Admin not Found")
 	}
-	err = result.Decode(&admin)
 	if err != nil {
 		pkg.Log.Fatal("Failed to find Admin", zap.Error(err))
 	}

@@ -44,12 +44,23 @@ func Load() (*Config, error) {
 
 	return cfg, nil
 }
+
+var appConfig *Config
+
 func MustLoad() *Config {
+
+	if appConfig != nil {
+		return appConfig
+	}
+
 	cfg, err := Load()
 	if err != nil {
 		panic(err)
 	}
-	return cfg
+
+	appConfig = cfg
+
+	return appConfig
 }
 
 // here func (c *Config) --> this means attach me to Config struct

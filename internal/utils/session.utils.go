@@ -32,14 +32,50 @@ func CreateSession(adminID string) (string, error) {
 	return sessionID, nil
 }
 
-func DeleteSession(sessionToken string) (string, error) {
-	return "", nil
+func DeleteSession(sessionID string) error {
+	key := SessionPrefix + sessionID
+
+	err := database.RedisClient.Del(
+		context.Background(),
+		key,
+	).Err()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func RefreshSession(sessionToken string) (string, error) {
-	return "", nil
+func RefreshSession(sessionID string) error {
+
+	key := SessionPrefix + sessionID
+
+	err := database.RedisClient.Expire(
+		context.Background(),
+		key,
+		SessionTTL,
+	).Err()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func GetSession(sessionToken string) (string, error) {
-	return "", nil
+func GetSession(sessionID string) (string, error) {
+
+	key := SessionPrefix + sessionID
+
+	adminID, err := database.RedisClient.Get(
+		context.Background(),
+		key,
+	).Result()
+
+	if err != nil {
+		return "", err
+	}
+
+	return adminID, nil
 }
