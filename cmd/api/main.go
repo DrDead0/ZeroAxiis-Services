@@ -13,9 +13,11 @@ import (
 
 func main() {
 
+	
 	// Load Configuration
 	cfg := config.MustLoad()
 
+	
 	//Logger initalization
 	err := pkg.Init(cfg.AppEnv)
 	if err != nil {
@@ -24,11 +26,11 @@ func main() {
 	defer pkg.Log.Sync()
 
 	// Connect MongoDB
-	mongoClient, err := database.ConnectMongo(cfg.MongoURI)
+	_, err = database.ConnectMongo(cfg.MongoURI)
 	if err != nil {
 		log.Fatal(err)
 	}
-	_ = mongoClient
+
 
 	// Create Gin Engine
 	router := gin.Default()
@@ -43,11 +45,10 @@ func main() {
 	api := router.Group("/api/v1")
 
 	//redis connection heheheh
-	redisClient, err := database.ConnectRedis(cfg.RedisURI)
+	_, err = database.ConnectRedis(cfg.RedisURI)
 	if err != nil {
 		log.Fatal(err)
 	}
-	_ = redisClient
 
 	//routes
 	routes.SetupRoutes(api)
