@@ -18,11 +18,11 @@ type TeamMember struct {
 }
 
 type CreateTeamMemberRequest struct {
-	Name          string `json:"name" binding:"required"`
-	Role          string `json:"role" binding:"required"`
-	Description   string `json:"description" binding:"required"`
-	ImageURL      string `json:"image_url" binding:"required"`
-	ImagePublicID string `json:"image_public_id" binding:"required"`
+	Name          string `form:"name" binding:"required"`
+	Role          string `form:"role" binding:"required"`
+	Description   string `form:"description" binding:"required"`
+	// ImageURL      string `json:"image_url" binding:"required"`
+	// ImagePublicID string `json:"image_public_id" binding:"required"`
 }
 
 type UpdateTeamMemberRequest struct {
