@@ -13,11 +13,9 @@ import (
 
 func main() {
 
-	
 	// Load Configuration
 	cfg := config.MustLoad()
 
-	
 	//Logger initalization
 	err := pkg.Init(cfg.AppEnv)
 	if err != nil {
@@ -30,7 +28,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 
 	// Create Gin Engine
 	router := gin.Default()
@@ -50,6 +47,10 @@ func main() {
 		log.Fatal(err)
 	}
 
+	err = database.ConnectCloudinary()
+	if err != nil {
+		panic(err)
+	}
 	//routes
 	routes.SetupRoutes(api)
 
