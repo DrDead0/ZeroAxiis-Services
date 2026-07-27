@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"time"
 
@@ -15,6 +16,29 @@ import (
 )
 
 func GetTeamMembers(c *gin.Context) {
+	cachedData, err := utils.GetCache("team")
+	if err == nil {
+		var members []models.TeamMember
+		err = json.Unmarshal(
+			[]byte(cachedData),
+			&members,
+		)
+
+		if err == nil {
+			pkg.Log.Info(
+				"Team Members Featched From Redis Cache",
+			)
+			c.JSON(http.StatusOK, gin.H{
+				"success": true,
+				"data":    members,
+			})
+			return
+		}
+		pkg.Log.Warn(
+			"Failed to Decode Cached Team data",
+			zap.Error(err),
+		)
+	}
 	teamCollection := database.MongoClient.Database("zeroaxiiscom").Collection("team")
 
 	cursor, err := teamCollection.Find(
@@ -48,6 +72,18 @@ func GetTeamMembers(c *gin.Context) {
 		})
 		return
 	}
+	err = utils.SetCache(
+		"team",
+		members,
+		time.Hour,
+	)
+	if err != nil {
+		pkg.Log.Warn(
+			"Failed To Cache Team members",
+			zap.Error(err),
+		)
+	}
+
 	pkg.Log.Info(
 		"Team Members Successfully Fetched",
 		zap.Any("data", members),
@@ -147,6 +183,13 @@ func CreateTeamMember(c *gin.Context) {
 
 		return
 	}
+	err = utils.DeleteCache("team")
+	if err != nil {
+		pkg.Log.Warn(
+			"Failed to Delete Team Cache",
+			zap.Error(err),
+		)
+	}
 	pkg.Log.Info(
 		"Team Member Created Successfully",
 		zap.String("name", member.Name),
@@ -160,8 +203,265 @@ func CreateTeamMember(c *gin.Context) {
 
 func UpdateTeamMember(c *gin.Context) {
 
+	id := c.Param("id")
+
+	objectID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		pkg.Log.Warn(
+			"Invlaid Team Member ID",
+			zap.Error(err),
+		)
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid Team Member ID",
+		})
+		return
+	}
+
+	teamCollection := database.MongoClient.Database("zeroaxiiscom").Collection("team")
+
+	var member models.TeamMember
+
+	err = teamCollection.FindOne(
+		context.Background(),
+		bson.M{
+			"_id": objectID,
+		},
+	).Decode(&member)
+
+	if err != nil {
+		pkg.Log.Warn(
+			"Team Memeber Not Found",
+			zap.String("id", id),
+		)
+
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "Team Member Not Found",
+		})
+		return
+	}
+
+	var request models.UpdateTeamMemberRequest
+
+	err = c.ShouldBind(&request)
+	if err != nil {
+		pkg.Log.Warn(
+			"Invalid Update Request",
+			zap.Error(err),
+		)
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid Request",
+		})
+		return
+	}
+
+	update := bson.M{}
+
+	if request.Name != "" {
+		update["name"] = request.Name
+	}
+
+	if request.Role != "" {
+		update["role"] = request.Role
+	}
+
+	if request.Description != "" {
+		update["description"] = request.Description
+	}
+
+	var imageResponse models.ImageUploadReponse
+
+	fileHeader, err := c.FormFile("image")
+	if err == nil {
+
+		imageResponse, err = utils.UploadImage(
+			fileHeader,
+			"Team",
+		)
+
+		if err != nil {
+
+			pkg.Log.Error(
+				"Failed To Upload New Team Member Image",
+				zap.Error(err),
+			)
+
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "Failed To Upload Image",
+			})
+
+			return
+		}
+
+		update["image_url"] = imageResponse.ImageURL
+		update["image_public_id"] = imageResponse.ImagePublicID
+	}
+
+	if len(update) == 0 {
+
+		pkg.Log.Warn(
+			"No Feild Provided For Update",
+		)
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "No Field Provided For Update",
+		})
+
+		return
+	}
+
+	update["updated_at"] = time.Now()
+	_, err = teamCollection.UpdateOne(
+		context.Background(),
+		bson.M{
+			"_id": objectID,
+		},
+		bson.M{
+			"$set": update,
+		},
+	)
+
+	if err != nil {
+
+		if imageResponse.ImagePublicID != "" {
+
+			_ = utils.DeleteImage(
+				imageResponse.ImagePublicID,
+			)
+
+		}
+
+		pkg.Log.Error(
+			"Failed To Update Team Member",
+			zap.Error(err),
+		)
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Failed To Update Team Member",
+		})
+
+		return
+	}
+
+	if imageResponse.ImagePublicID != "" {
+
+		err = utils.DeleteImage(
+			member.ImagePublicID,
+		)
+
+		if err != nil {
+
+			pkg.Log.Warn(
+				"Failed To Delete Old Team Member Image",
+				zap.Error(err),
+			)
+
+		}
+	}
+
+	err = utils.DeleteCache("team")
+	if err != nil {
+
+		pkg.Log.Warn(
+			"Failed To Delete Team Cache",
+			zap.Error(err),
+		)
+
+	}
+
+	pkg.Log.Info(
+		"Team Member Updated Successfully",
+		zap.String("id", id),
+	)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Team Member Updated Successfully",
+	})
+
 }
 
 func DeleteTeamMember(c *gin.Context) {
+	id := c.Param("id")
+	objectID, err := bson.ObjectIDFromHex(id)
+
+	if err != nil {
+		pkg.Log.Warn(
+			"Invalid Team Member ID",
+			zap.Error(err),
+		)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid Team Member ID",
+		})
+		return
+	}
+	teamCollection := database.MongoClient.Database("zeroaxiiscom").Collection("team")
+	var members models.TeamMember
+
+	err = teamCollection.FindOne(
+		context.Background(),
+		bson.M{
+			"_id": objectID,
+		},
+	).Decode(&members)
+	if err != nil {
+		pkg.Log.Warn(
+			"Team Member Not Found",
+			zap.String("id", id),
+		)
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "Team Member not Found",
+		})
+		return
+	}
+	_, err = teamCollection.DeleteOne(
+		context.Background(),
+		bson.M{
+			"_id": objectID,
+		},
+	)
+	if err != nil {
+		pkg.Log.Error(
+			"Failed To Delete Team Member",
+			zap.Error(err),
+		)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Failed To Delete Team Member",
+		})
+		return
+	}
+	err = utils.DeleteCache("team")
+	if err != nil {
+		pkg.Log.Warn(
+			"Failed to Delete Team Cache",
+			zap.Error(err),
+		)
+	}
+	err = utils.DeleteImage(members.ImagePublicID)
+	if err != nil {
+		pkg.Log.Warn(
+			"Failed to Delete Team Member Image",
+			zap.Error(err),
+		)
+	}
+
+	pkg.Log.Info(
+		"Team Member Deleted Successfully",
+		zap.String("id", id),
+	)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Team Memeber Deleted Successfully",
+	})
 
 }
