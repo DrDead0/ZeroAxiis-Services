@@ -7,7 +7,7 @@ import (
 )
 
 type Testimonial struct {
-	ID bson.ObjectID `bson:"_id, omitempty" json:"id"`
+	ID bson.ObjectID `bson:"_id,omitempty" json:"id"`
 	Name string `bson:"name" json:"name"`
 	Role string `bson:"role" json:"role"`
 	Company string `bson:"company" json:"company"`
