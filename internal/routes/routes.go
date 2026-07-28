@@ -9,4 +9,5 @@ func SetupRoutes(api *gin.RouterGroup) {
 	HealthRoutes(api)
 	AuthRoutes(api)
 	TeamRoutes(api)
+	TestimonialRoutes(api)
 }
