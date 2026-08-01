@@ -13,6 +13,8 @@ ZeroAxiis Backend is the official API responsible for serving dynamic content to
 
 The backend follows a layered architecture and is designed with scalability, maintainability, and clean code principles in mind.
 
+`NOTE: This repository is publicly accessible for transparency, portfolio, educational, and evaluation purposes only not for public use.`
+
 The frontend consumes this API to display:
 
 - Team Members
@@ -134,4 +136,4 @@ This backend follows a few core principles:
 - Cloudinary stores media assets.
 - External APIs are handled by the backend.
 
-NOTE: This repository is publicly accessible for transparency, portfolio, educational, and evaluation purposes only not for public use.
+
