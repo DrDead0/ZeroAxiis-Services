@@ -10,4 +10,5 @@ func SetupRoutes(api *gin.RouterGroup) {
 	AuthRoutes(api)
 	TeamRoutes(api)
 	TestimonialRoutes(api)
+	BlogRoutes(api)
 }
