@@ -18,6 +18,7 @@ type Config struct {
 	AppEnv              string
 	PublicFrontend      string
 	AdminFrontend       string
+	YouTubeAPIKey       string
 }
 
 func Load() (*Config, error) {
@@ -36,6 +37,7 @@ func Load() (*Config, error) {
 		AppEnv:              os.Getenv("APP_ENV"),
 		PublicFrontend:      os.Getenv("PUBLIC_FRONTEND"),
 		AdminFrontend:       os.Getenv("ADMIN_FRONTEND"),
+		YouTubeAPIKey:       os.Getenv("YOUTUBE_API_KEY"),
 	}
 
 	if err := cfg.validate(); err != nil {
@@ -86,6 +88,8 @@ func (c *Config) validate() error {
 		return errors.New("Public Frontend URL is needed for CORS")
 	case c.AdminFrontend == "":
 		return errors.New("Admin Frontend url is needed for Data Management")
+	case c.YouTubeAPIKey == "":
+		return errors.New("YouTube API Key is Required")
 	}
 	return nil
 }
