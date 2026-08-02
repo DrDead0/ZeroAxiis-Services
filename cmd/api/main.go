@@ -33,7 +33,7 @@ func main() {
 	router := gin.Default()
 
 	//middleware
-	router.Use(middleware.CORS(cfg.AdminFrontend, cfg.PublicFrontend))
+	router.Use(middleware.CORS(cfg.PublicFrontend, cfg.AdminFrontend))
 	//security header hehehe
 	router.Use(middleware.SecurityHeaders())
 	router.Use(middleware.JSONBodyLimit(16 * 1024)) // 16kb

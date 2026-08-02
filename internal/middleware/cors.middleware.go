@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -11,8 +12,8 @@ func CORS(publicFrontend string, adminFrontend string) gin.HandlerFunc {
 
 	config := cors.Config{
 		AllowOrigins: []string{
-			publicFrontend,
-			adminFrontend,
+			strings.TrimSuffix(publicFrontend, "/"),
+			strings.TrimSuffix(adminFrontend, "/"),
 		},
 
 		AllowMethods: []string{
@@ -21,11 +22,21 @@ func CORS(publicFrontend string, adminFrontend string) gin.HandlerFunc {
 			"PUT",
 			"PATCH",
 			"DELETE",
+			"OPTIONS",
 		},
 
 		AllowHeaders: []string{
 			"Origin",
 			"Content-Type",
+			"Authorization",
+			"Accept",
+			"X-Requested-With",
+			"Access-Control-Allow-Origin",
+			"Access-Control-Allow-Headers",
+		},
+
+		ExposeHeaders: []string{
+			"Content-Length",
 			"Authorization",
 		},
 
@@ -36,3 +47,4 @@ func CORS(publicFrontend string, adminFrontend string) gin.HandlerFunc {
 
 	return cors.New(config)
 }
+
