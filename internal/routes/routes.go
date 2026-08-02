@@ -12,4 +12,5 @@ func SetupRoutes(api *gin.RouterGroup) {
 	TestimonialRoutes(api)
 	BlogRoutes(api)
 	CreativeRoutes(api)
+	ProjectRoutes(api)
 }
