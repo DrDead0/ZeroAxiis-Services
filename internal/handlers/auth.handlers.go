@@ -111,7 +111,7 @@ func Login(c *gin.Context) {
 		15*60,
 		"/",
 		"",
-		false,
+		true,
 		true,
 	)
 	c.JSON(http.StatusOK, gin.H{
