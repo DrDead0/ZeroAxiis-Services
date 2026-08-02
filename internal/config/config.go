@@ -37,7 +37,7 @@ func Load() (*Config, error) {
 		AppEnv:              os.Getenv("APP_ENV"),
 		PublicFrontend:      os.Getenv("PUBLIC_FRONTEND"),
 		AdminFrontend:       os.Getenv("ADMIN_FRONTEND"),
-		YouTubeAPIKey:       os.Getenv("YOUTUBE_API_KEY"),
+		YouTubeAPIKey:       os.Getenv("YouTubeAPIKey"),
 	}
 
 	if err := cfg.validate(); err != nil {
