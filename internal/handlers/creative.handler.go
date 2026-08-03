@@ -541,3 +541,75 @@ func UpdateCreative(c *gin.Context) {
 	})
 
 }
+func DeleteCreative(c *gin.Context) {
+
+	id := c.Param("id")
+
+	objectId, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		pkg.Log.Warn(
+			"Invalid Creative ID Format",
+			zap.Error(err),
+		)
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid Creative ID Format",
+		})
+		return
+	}
+
+	creativeCollection := database.MongoClient.
+		Database("zeroaxiiscom").
+		Collection("creative")
+
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		10*time.Second,
+	)
+	defer cancel()
+
+	result, err := creativeCollection.DeleteOne(
+		ctx,
+		bson.M{"_id": objectId},
+	)
+
+	if err != nil {
+		pkg.Log.Error(
+			"Failed To Delete Creative",
+			zap.Error(err),
+		)
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Failed To Delete Creative",
+		})
+		return
+	}
+
+	if result.DeletedCount == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "Creative Not Found",
+		})
+		return
+	}
+
+	err = utils.DeleteCache("creative")
+	if err != nil {
+		pkg.Log.Warn(
+			"Failed To Delete Creative Cache",
+			zap.Error(err),
+		)
+	}
+
+	pkg.Log.Info(
+		"Creative Deleted Successfully",
+		zap.String("id", id),
+	)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Creative Deleted Successfully",
+	})
+}

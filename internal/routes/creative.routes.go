@@ -12,4 +12,5 @@ func CreativeRoutes(api *gin.RouterGroup) {
 	creative.Use(middleware.AuthMiddleware())
 	creative.POST("", handlers.CreateCreative)
 	creative.PATCH("/:id", handlers.UpdateCreative)
+	creative.DELETE("/:id", handlers.DeleteCreative)
 }

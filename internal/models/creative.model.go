@@ -31,21 +31,21 @@ type Creative struct {
 }
 
 type CreateCreativeRequest struct {
-	VideoURL string `form:"video_url" binding:"required"`
+	VideoURL string `form:"video_url" json:"video_url" binding:"required"`
 
-	Summary string `form:"summary" binding:"required"`
+	Summary string `form:"summary" json:"summary" binding:"required"`
 
-	Category string `form:"category" binding:"required"`
+	Category string `form:"category" json:"category" binding:"required"`
 
-	Featured bool `form:"featured"`
+	Featured bool `form:"featured" json:"featured"`
 }
 
 type UpdateCreativeRequest struct {
-	VideoURL string `form:"video_url"`
+	VideoURL string `form:"video_url" json:"video_url"`
 
-	Summary string `form:"summary"`
+	Summary string `form:"summary" json:"summary"`
 
-	Category string `form:"category"`
+	Category string `form:"category" json:"category"`
 
-	Featured *bool `form:"featured"`
+	Featured *bool `form:"featured" json:"featured"`
 }
